@@ -41,7 +41,7 @@ const options: HttpProviderOptions = {
   headers: [
     {
       name: 'Authorization',
-      value: `Basic ${window.btoa(ACCESS_KEY + SECRET_KEY)}`,
+      value: `Basic ${window.btoa(`${ACCESS_KEY}:${SECRET_KEY}`)}`,
     },
     {
       name: 'x-chain-id',
@@ -67,7 +67,7 @@ const readCount = async () => {
 };
 
 function App() {
-  // readCount();
+  readCount();
 
   return (
     <div className="App">
