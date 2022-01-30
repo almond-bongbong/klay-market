@@ -66,8 +66,17 @@ const readCount = async () => {
   console.log(value);
 };
 
+const getBalance = async (address: string) => {
+  const response = await caver.rpc.klay.getBalance(address);
+  return caver.utils.convertFromPeb(
+    caver.utils.hexToNumberString(response),
+    'KLAY',
+  );
+};
+
 function App() {
   readCount();
+  getBalance('0x9e97a0d60Cfd4e1bb69D001C998d306541412359').then(console.log);
 
   return (
     <div className="App">
