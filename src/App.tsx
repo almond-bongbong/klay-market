@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Caver, { AbiItem, HttpProviderOptions } from 'caver-js';
 
@@ -74,6 +73,23 @@ const getBalance = async (address: string) => {
   );
 };
 
+const storeCount = async (newValue: number) => {
+  const deployer = caver.wallet.keyring.createFromPrivateKey(
+    'address private key',
+  );
+  caver.wallet.add(deployer);
+
+  try {
+    const result = await StorageContract.methods.store(newValue).send({
+      from: deployer.address,
+      gas: '0x4bfd200',
+    });
+    console.log(result);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 function App() {
   readCount();
   getBalance('0x9e97a0d60Cfd4e1bb69D001C998d306541412359').then(console.log);
@@ -81,18 +97,9 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <button type="button" onClick={() => storeCount(10)}>
+          store count
+        </button>
       </header>
     </div>
   );
