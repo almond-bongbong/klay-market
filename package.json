@@ -22,7 +22,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-app-rewired start",
+    "start:testnet": "env-cmd -f .env.baobab react-app-rewired start",
+    "start:mainnet": "env-cmd -f .env.cypress react-app-rewired start",
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject"
@@ -46,6 +47,7 @@
     ]
   },
   "devDependencies": {
+    "env-cmd": "^10.1.0",
     "prettier": "^2.5.1",
     "react-app-rewired": "^2.1.11"
   }
