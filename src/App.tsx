@@ -1,16 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode.react';
 import './App.css';
 import useKlip from './hook/useKlip';
+import { getBalance, readCount } from './api/caver';
 
 function App() {
-  // readCount();
-  // getBalance('0x9e97a0d60Cfd4e1bb69D001C998d306541412359').then(console.log);
-  const { getKlipAddress, authRequestUrl } = useKlip();
+  const { authRequestUrl, getKlipAddress, storeValue } = useKlip();
+  const [balance, setBalance] = useState('');
+  const [store, setStore] = useState('');
+
+  useEffect(() => {
+    readCount().then(setStore);
+  }, []);
 
   const handleGetAddressClick = async () => {
-    const result = await getKlipAddress();
-    console.log(result);
+    const data = await getKlipAddress();
+    const klayBalance = await getBalance(data.result.klaytn_address);
+    setBalance(klayBalance);
+  };
+
+  const handleStoreValueClick = async () => {
+    await storeValue(100);
+    const count = await readCount();
+    setStore(count);
   };
 
   return (
@@ -21,6 +33,15 @@ function App() {
         <button type="button" onClick={handleGetAddressClick}>
           주소 가져오기
         </button>
+        <br />
+        balance : {balance}
+        <br />
+        <br />
+        <button type="button" onClick={handleStoreValueClick}>
+          스마트 컨트랙트 트랜잭션 실행
+        </button>
+        <br />
+        store : {store}
       </header>
     </div>
   );

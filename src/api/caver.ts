@@ -27,10 +27,7 @@ const StorageContract = new caver.contract(
   process.env.REACT_APP_STORAGE_CONTRACT_ADDRESS,
 );
 
-export const readCount = async () => {
-  const value = await StorageContract.methods.retrieve().call();
-  console.log(value);
-};
+export const readCount = () => StorageContract.methods.retrieve().call();
 
 export const getBalance = async (address: string) => {
   const response = await caver.rpc.klay.getBalance(address);
