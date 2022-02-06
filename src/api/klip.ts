@@ -1,58 +1,37 @@
-import Caver, { HttpProviderOptions } from 'caver-js';
-import { STORAGE_ABI } from '../abi/storage-abi';
+import axios from 'axios';
+import { delay } from '../lib/util';
 
-const options: HttpProviderOptions = {
-  headers: [
+interface Result {
+  request_key: string;
+  expiration_time: number;
+  status: string;
+  result: {
+    klaytn_address: string;
+  };
+}
+
+export const getResult = async (requestKey: string): Promise<Result> => {
+  const { data } = await axios.get(
+    `https://a2a-api.klipwallet.com/v2/a2a/result`,
     {
-      name: 'Authorization',
-      value: `Basic ${window.btoa(
-        `${process.env.REACT_APP_KLAY_ACCESS_KEY}:${process.env.REACT_APP_KLAY_SECRET_KEY}`,
-      )}`,
+      params: {
+        request_key: requestKey,
+        ts: new Date(),
+      },
     },
-    {
-      name: 'x-chain-id',
-      value: process.env.REACT_APP_CHAIN_ID,
-    },
-  ],
-};
-
-const caver = new Caver(
-  new Caver.providers.HttpProvider(
-    'https://node-api.klaytnapi.com/v1/klaytn',
-    options,
-  ),
-);
-const StorageContract = new caver.contract(
-  STORAGE_ABI,
-  process.env.REACT_APP_STORAGE_CONTRACT_ADDRESS,
-);
-
-export const readCount = async () => {
-  const value = await StorageContract.methods.retrieve().call();
-  console.log(value);
-};
-
-export const getBalance = async (address: string) => {
-  const response = await caver.rpc.klay.getBalance(address);
-  return caver.utils.convertFromPeb(
-    caver.utils.hexToNumberString(response),
-    'KLAY',
   );
-};
-
-export const storeCount = async (newValue: number) => {
-  const deployer = caver.wallet.keyring.createFromPrivateKey(
-    'address private key',
-  );
-  caver.wallet.add(deployer);
-
-  try {
-    const result = await StorageContract.methods.store(newValue).send({
-      from: deployer.address,
-      gas: '0x4bfd200',
-    });
-    console.log(result);
-  } catch (error) {
-    console.log(error);
+  if (data.result) {
+    return data.result;
   }
+
+  await delay(1000);
+  return getResult(requestKey);
 };
+
+export const prepareKlipAuth = () =>
+  axios.post('https://a2a-api.klipwallet.com/v2/a2a/prepare', {
+    bapp: {
+      name: 'KLAY_MARKET',
+    },
+    type: 'auth',
+  });

@@ -1,16 +1,25 @@
 import React from 'react';
+import QRCode from 'qrcode.react';
 import './App.css';
-import { readCount, storeCount } from './api/klip';
+import useKlip from './hook/useKlip';
 
 function App() {
-  readCount();
+  // readCount();
   // getBalance('0x9e97a0d60Cfd4e1bb69D001C998d306541412359').then(console.log);
+  const { getKlipAddress, authRequestUrl } = useKlip();
+
+  const handleGetAddressClick = async () => {
+    const result = await getKlipAddress();
+    console.log(result);
+  };
 
   return (
     <div className="App">
       <header className="App-header">
-        <button type="button" onClick={() => storeCount(10)}>
-          store count
+        {authRequestUrl && <QRCode value={authRequestUrl} />}
+        <br />
+        <button type="button" onClick={handleGetAddressClick}>
+          주소 가져오기
         </button>
       </header>
     </div>
