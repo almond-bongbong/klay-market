@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import 'antd/dist/antd.css';
 
 console.log('NODE_ENV :', process.env.NODE_ENV);
 console.log('KLAY_ACCESS_KEY :', process.env.REACT_APP_KLAY_ACCESS_KEY);

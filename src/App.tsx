@@ -1,49 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import QRCode from 'qrcode.react';
+import React, { useCallback, useEffect, useState } from 'react';
 import './App.css';
 import useKlip from './hook/useKlip';
-import { getBalance, readCount } from './api/caver';
+import { getBalance } from './api/caver';
+import QRCode from 'qrcode.react';
+import { Layout, PageHeader, Row, Statistic } from 'antd';
+
+const { Header } = Layout;
 
 function App() {
-  const { authRequestUrl, getKlipAddress, storeValue } = useKlip();
-  const [balance, setBalance] = useState('');
-  const [store, setStore] = useState('');
+  const { authRequestUrl, getKlipAddress } = useKlip();
+  const [myBalance, setMyBalance] = useState('');
+  const [myAddress, setMyAddress] = useState('');
+  const [nftList] = useState<string[]>([]);
 
-  useEffect(() => {
-    readCount().then(setStore);
-  }, []);
-
-  const handleGetAddressClick = async () => {
+  const getUser = useCallback(async () => {
     const data = await getKlipAddress();
     const klayBalance = await getBalance(data.result.klaytn_address);
-    setBalance(klayBalance);
-  };
+    setMyBalance(klayBalance);
+    setMyAddress(data.result.klaytn_address);
+  }, [getKlipAddress]);
 
-  const handleStoreValueClick = async () => {
-    await storeValue(100);
-    const count = await readCount();
-    setStore(count);
-  };
+  useEffect(() => {
+    getUser();
+  }, [getUser]);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        {authRequestUrl && <QRCode value={authRequestUrl} />}
-        <br />
-        <button type="button" onClick={handleGetAddressClick}>
-          주소 가져오기
-        </button>
-        <br />
-        balance : {balance}
-        <br />
-        <br />
-        <button type="button" onClick={handleStoreValueClick}>
-          스마트 컨트랙트 트랜잭션 실행
-        </button>
-        <br />
-        store : {store}
-      </header>
-    </div>
+    <Layout>
+      <PageHeader title="내 지갑" subTitle={myAddress}>
+        <Row>
+          <Statistic title="Balance" prefix="klay" value={myBalance} />
+        </Row>
+      </PageHeader>
+      <div style={{ textAlign: 'center' }}>
+        {authRequestUrl && <QRCode value={authRequestUrl} size={200} />}
+      </div>
+      <div>{myBalance}</div>
+      <div>{myAddress}</div>
+      <div>{nftList}</div>
+    </Layout>
   );
 }
 
