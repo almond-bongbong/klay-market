@@ -1,11 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import './App.css';
 import useKlip from './hook/useKlip';
 import { getBalance } from './api/caver';
 import QRCode from 'qrcode.react';
 import { Layout, PageHeader, Row, Statistic } from 'antd';
-
-const { Header } = Layout;
 
 function App() {
   const { authRequestUrl, getKlipAddress } = useKlip();
@@ -25,7 +22,7 @@ function App() {
   }, [getUser]);
 
   return (
-    <Layout>
+    <Layout style={{ minHeight: '100vh' }}>
       <PageHeader title="내 지갑" subTitle={myAddress}>
         <Row>
           <Statistic title="Balance" prefix="klay" value={myBalance} />
@@ -34,8 +31,6 @@ function App() {
       <div style={{ textAlign: 'center' }}>
         {authRequestUrl && <QRCode value={authRequestUrl} size={200} />}
       </div>
-      <div>{myBalance}</div>
-      <div>{myAddress}</div>
       <div>{nftList}</div>
     </Layout>
   );
