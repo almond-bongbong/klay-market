@@ -1,14 +1,16 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import useKlip from './hook/useKlip';
-import { getBalance } from './api/caver';
+import { getBalance, getNftListOf } from './api/caver';
 import QRCode from 'qrcode.react';
-import { Layout, PageHeader, Row, Statistic } from 'antd';
+import { Card, Col, Layout, PageHeader, Row, Statistic } from 'antd';
 
 function App() {
   const { authRequestUrl, getKlipAddress } = useKlip();
   const [myBalance, setMyBalance] = useState('');
   const [myAddress, setMyAddress] = useState('');
-  const [nftList] = useState<string[]>([]);
+  const [nftList, setNftList] = useState<
+    { tokenId: string; tokenURI: string }[]
+  >([]);
 
   const getUser = useCallback(async () => {
     const data = await getKlipAddress();
@@ -21,6 +23,14 @@ function App() {
     getUser();
   }, [getUser]);
 
+  useEffect(() => {
+    if (!myAddress) return;
+    (async () => {
+      const nftListData = await getNftListOf(myAddress);
+      setNftList(nftListData);
+    })();
+  }, [myAddress]);
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <PageHeader title="내 지갑" subTitle={myAddress}>
@@ -31,7 +41,17 @@ function App() {
       <div style={{ textAlign: 'center' }}>
         {authRequestUrl && <QRCode value={authRequestUrl} size={200} />}
       </div>
-      <div>{nftList}</div>
+      <div style={{ marginTop: 50, padding: 30 }}>
+        <Row gutter={[16, 16]}>
+          {nftList.map((nft) => (
+            <Col span={6}>
+              <Card hoverable cover={<img src={nft.tokenURI} alt="NFT" />}>
+                <Card.Meta title={`NFT ${nft.tokenId}`} />
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </div>
     </Layout>
   );
 }
