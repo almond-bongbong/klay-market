@@ -39,6 +39,25 @@ export const prepareKlipAuth = () =>
     type: 'auth',
   });
 
+export const prepareExecuteContract = (
+  txTo: string,
+  abi: string,
+  value: string,
+  params: string[],
+) =>
+  axios.post('https://a2a-api.klipwallet.com/v2/a2a/prepare', {
+    bapp: {
+      name: APP_NAME,
+    },
+    type: 'execute_contract',
+    transaction: {
+      to: txTo,
+      abi,
+      value,
+      params: params ? `[${params.map((p) => `"${p}"`).join(',')}]` : '',
+    },
+  });
+
 export const prepareExecuteStoreContract = (storeValue: number) =>
   axios.post('https://a2a-api.klipwallet.com/v2/a2a/prepare', {
     bapp: {

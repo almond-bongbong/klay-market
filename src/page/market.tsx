@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import useKlip from './hook/useKlip';
-import { getBalance, getNftListOf } from './api/caver';
+import { Card, Col, PageHeader, Row, Statistic } from 'antd';
 import QRCode from 'qrcode.react';
-import { Card, Col, Layout, PageHeader, Row, Statistic } from 'antd';
+import useKlip from '../hook/useKlip';
+import { getBalance, getNftListOf } from '../api/caver';
+import { useMyContext } from '../context/my-context';
 
-function App() {
+function Market() {
+  const { setAddress } = useMyContext();
   const { authRequestUrl, getKlipAddress } = useKlip();
   const [myBalance, setMyBalance] = useState('');
   const [myAddress, setMyAddress] = useState('');
@@ -17,7 +19,8 @@ function App() {
     const klayBalance = await getBalance(data.result.klaytn_address);
     setMyBalance(klayBalance);
     setMyAddress(data.result.klaytn_address);
-  }, [getKlipAddress]);
+    setAddress(data.result.klaytn_address);
+  }, [getKlipAddress, setAddress]);
 
   useEffect(() => {
     getUser();
@@ -32,7 +35,7 @@ function App() {
   }, [myAddress]);
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <div>
       <PageHeader title="내 지갑" subTitle={myAddress}>
         <Row>
           <Statistic title="Balance" prefix="klay" value={myBalance} />
@@ -44,7 +47,7 @@ function App() {
       <div style={{ marginTop: 50, padding: 30 }}>
         <Row gutter={[16, 16]}>
           {nftList.map((nft) => (
-            <Col span={6}>
+            <Col span={6} key={nft.tokenId}>
               <Card hoverable cover={<img src={nft.tokenURI} alt="NFT" />}>
                 <Card.Meta title={`NFT ${nft.tokenId}`} />
               </Card>
@@ -52,8 +55,8 @@ function App() {
           ))}
         </Row>
       </div>
-    </Layout>
+    </div>
   );
 }
 
-export default App;
+export default Market;

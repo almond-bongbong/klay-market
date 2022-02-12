@@ -1,5 +1,5 @@
 import Caver, { HttpProviderOptions } from 'caver-js';
-import { KIP17_TOKEN_ABI } from '../abi/kip17-token-abi';
+import { KIP17_TOKEN_ABI } from '../abi/nft-abi';
 import { concurrent, map, pipe, range, toArray, toAsync } from '@fxts/core';
 
 const options: HttpProviderOptions = {
@@ -31,7 +31,7 @@ const caver = new Caver(
 
 const NFTContract = new caver.contract(
   KIP17_TOKEN_ABI,
-  process.env.REACT_APP_KIP17_CONTRACT_ADDRESS,
+  process.env.REACT_APP_NFT_CONTRACT_ADDRESS,
 );
 
 export const getBalance = async (address: string) => {
@@ -61,6 +61,12 @@ export const getNftListOf = async (address: string) => {
     toArray,
   );
 };
+
+export const mintCardWithURI = async (
+  to: string,
+  tokenId: string,
+  uri: string,
+) => {};
 
 // export const readCount = () => StorageContract.methods.retrieve().call();
 
