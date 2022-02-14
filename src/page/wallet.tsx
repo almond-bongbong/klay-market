@@ -26,16 +26,21 @@ function Wallet() {
   }, [getKlipAddress, setMe]);
 
   useEffect(() => {
-    getUser();
-  }, [getUser]);
+    if (!me) {
+      getUser();
+    }
+  }, [me, getUser]);
+
+  const initMyNftList = useCallback(async () => {
+    if (!me?.address) return;
+
+    const nftListData = await getNftListOf(me.address);
+    setNftList(nftListData);
+  }, [me?.address]);
 
   useEffect(() => {
-    if (!me?.address) return;
-    (async () => {
-      const nftListData = await getNftListOf(me.address);
-      setNftList(nftListData);
-    })();
-  }, [me?.address]);
+    initMyNftList();
+  }, [initMyNftList]);
 
   const onClickCard = (tokenId: string) => {
     if (!me?.address) {
@@ -44,13 +49,14 @@ function Wallet() {
     }
 
     Modal.confirm({
-      title: `${tokenId} 카드를 마켓에 등록하시겠습니까?`,
+      title: `"${tokenId}"를 마켓에 등록하시겠습니까?`,
       onOk: async () => {
         setShowAuthRequestModal(true);
-        const result = await listingCardToMarket(me.address, tokenId);
-        if (result?.status === 'success') {
+        const data = await listingCardToMarket(me.address, tokenId);
+        if (data?.result?.status === 'success') {
           message.success('마켓에 등록되었습니다.');
           setShowAuthRequestModal(false);
+          await initMyNftList();
         }
       },
     });
@@ -91,6 +97,7 @@ function Wallet() {
         title="Authorization"
         bodyStyle={{ textAlign: 'center' }}
         onCancel={() => setShowAuthRequestModal(false)}
+        footer={false}
       >
         <QRCode value={authRequestUrl || ''} size={200} />
       </Modal>

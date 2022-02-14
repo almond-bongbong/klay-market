@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useLayoutEffect, useMemo, useState } from 'react';
 import { Layout, Menu } from 'antd';
 import { Link, Route, Routes, useLocation } from 'react-router-dom';
 import Market from './page/market';
@@ -13,10 +13,14 @@ function App() {
   const { setMe } = useMyContext();
   const savedMeString = localStorage.getItem(ME_STORAGE_KEY) || 'null';
   const savedMe = useMemo(() => JSON.parse(savedMeString), [savedMeString]);
+  const [initMe, setInitMe] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (savedMe) setMe(savedMe);
+    setInitMe(true);
   }, [savedMe, setMe]);
+
+  if (!initMe) return null;
 
   return (
     <Layout style={{ minHeight: '100vh' }}>

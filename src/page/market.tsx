@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Card, Col, message, Modal, PageHeader, Row, Statistic } from 'antd';
 import { getNftListOf, NftItem } from '../api/caver';
 import useKlip from '../hook/useKlip';
@@ -9,14 +9,16 @@ function Market() {
   const { authRequestUrl, buyCard } = useKlip();
   const [showAuthRequestModal, setShowAuthRequestModal] = useState(false);
 
-  useEffect(() => {
-    (async () => {
-      const nftListData = await getNftListOf(
-        process.env.REACT_APP_MARKET_CONTRACT_ADDRESS,
-      );
-      setNftList(nftListData);
-    })();
+  const initList = useCallback(async () => {
+    const nftListData = await getNftListOf(
+      process.env.REACT_APP_MARKET_CONTRACT_ADDRESS,
+    );
+    setNftList(nftListData);
   }, []);
+
+  useEffect(() => {
+    initList();
+  }, [initList]);
 
   const onClickBuy = async (tokenId: string) => {
     Modal.confirm({
@@ -26,6 +28,7 @@ function Market() {
           setShowAuthRequestModal(true);
           await buyCard(tokenId);
           message.success('구매하였습니다.');
+          await initList();
         } catch (error) {
           message.error('오류가 발생했습니다.');
         } finally {
@@ -64,6 +67,7 @@ function Market() {
         title="Authorization"
         bodyStyle={{ textAlign: 'center' }}
         zIndex={10000}
+        footer={false}
         onCancel={() => setShowAuthRequestModal(false)}
       >
         <QRCode value={authRequestUrl || ''} size={200} />

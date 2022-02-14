@@ -10,6 +10,8 @@ interface Result {
   status: string;
   result: {
     klaytn_address: string;
+    status?: string;
+    tx_hash?: string;
   };
 }
 
