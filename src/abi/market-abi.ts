@@ -1,4 +1,4 @@
-export const NFT_MARKET_ABI = [
+export const MARKET_ABI = [
   {
     constant: false,
     inputs: [

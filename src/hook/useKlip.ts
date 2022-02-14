@@ -6,6 +6,8 @@ import {
 } from '../api/klip';
 import { ua } from '../lib/ua';
 import { message } from 'antd';
+import { getAbiByName } from '../lib/util';
+import { NFT_ABI } from '../abi/nft-abi';
 
 function useKlip() {
   const [authRequestUrl, setAuthRequestUrl] = useState<string | null>(null);
@@ -30,19 +32,7 @@ function useKlip() {
       try {
         const { data } = await prepareExecuteContract(
           process.env.REACT_APP_NFT_CONTRACT_ADDRESS,
-          JSON.stringify({
-            constant: false,
-            inputs: [
-              { name: 'to', type: 'address' },
-              { name: 'tokenId', type: 'uint256' },
-              { name: 'tokenURI', type: 'string' },
-            ],
-            name: 'mintWithTokenURI',
-            outputs: [{ name: '', type: 'bool' }],
-            payable: false,
-            stateMutability: 'nonpayable',
-            type: 'function',
-          }),
+          JSON.stringify(getAbiByName(NFT_ABI, 'mintWithTokenURI')),
           '0',
           [toAddress, tokenId, tokenURI],
         );

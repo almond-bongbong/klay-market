@@ -1,6 +1,6 @@
 import { AbiItem } from 'caver-js';
 
-export const KIP17_TOKEN_ABI: AbiItem[] = [
+export const NFT_ABI: AbiItem[] = [
   {
     constant: true,
     inputs: [

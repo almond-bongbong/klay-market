@@ -1,5 +1,5 @@
 import Caver, { HttpProviderOptions } from 'caver-js';
-import { KIP17_TOKEN_ABI } from '../abi/nft-abi';
+import { NFT_ABI } from '../abi/nft-abi';
 import { concurrent, map, pipe, range, toArray, toAsync } from '@fxts/core';
 
 const options: HttpProviderOptions = {
@@ -30,7 +30,7 @@ const caver = new Caver(
 // );
 
 const NFTContract = new caver.contract(
-  KIP17_TOKEN_ABI,
+  NFT_ABI,
   process.env.REACT_APP_NFT_CONTRACT_ADDRESS,
 );
 
