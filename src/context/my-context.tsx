@@ -1,13 +1,18 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 
+interface Me {
+  address: string;
+  balance: string;
+}
+
 interface Context {
-  address: null | string;
-  setAddress: (address: string) => void;
+  me: Me | null;
+  setMe: (me: Me) => void;
 }
 
 const MyContext = createContext<Context>({
-  address: null,
-  setAddress: () => null,
+  me: null,
+  setMe: () => null,
 });
 
 interface Props {
@@ -15,12 +20,10 @@ interface Props {
 }
 
 export function MyProvider({ children }: Props) {
-  const [address, setAddress] = useState<string | null>(null);
+  const [me, setMe] = useState<Me | null>(null);
 
   return (
-    <MyContext.Provider value={{ address, setAddress }}>
-      {children}
-    </MyContext.Provider>
+    <MyContext.Provider value={{ me, setMe }}>{children}</MyContext.Provider>
   );
 }
 

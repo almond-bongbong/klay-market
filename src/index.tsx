@@ -4,6 +4,7 @@ import App from './app';
 import reportWebVitals from './reportWebVitals';
 import 'antd/dist/antd.css';
 import { BrowserRouter } from 'react-router-dom';
+import { MyProvider } from './context/my-context';
 
 console.log('NODE_ENV :', process.env.NODE_ENV);
 console.log('KLAY_ACCESS_KEY :', process.env.REACT_APP_KLAY_ACCESS_KEY);
@@ -11,7 +12,9 @@ console.log('KLAY_ACCESS_KEY :', process.env.REACT_APP_KLAY_ACCESS_KEY);
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <MyProvider>
+        <App />
+      </MyProvider>
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root'),

@@ -1,4 +1,6 @@
-export const MARKET_ABI = [
+import { AbiItem } from 'caver-js';
+
+export const MARKET_ABI: AbiItem[] = [
   {
     constant: false,
     inputs: [

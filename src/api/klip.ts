@@ -26,6 +26,9 @@ export const getResult = async (requestKey: string): Promise<Result> => {
   if (data.result?.status === 'success' || data.result?.klaytn_address) {
     return data;
   }
+  if (data.result?.status === 'fail') {
+    throw Error('transaction error');
+  }
 
   await delay(1000);
   return getResult(requestKey);

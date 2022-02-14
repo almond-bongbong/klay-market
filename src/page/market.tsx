@@ -1,60 +1,73 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Card, Col, PageHeader, Row, Statistic } from 'antd';
-import QRCode from 'qrcode.react';
+import React, { useEffect, useState } from 'react';
+import { Card, Col, message, Modal, PageHeader, Row, Statistic } from 'antd';
+import { getNftListOf, NftItem } from '../api/caver';
 import useKlip from '../hook/useKlip';
-import { getBalance, getNftListOf } from '../api/caver';
-import { useMyContext } from '../context/my-context';
+import QRCode from 'qrcode.react';
 
 function Market() {
-  const { setAddress } = useMyContext();
-  const { authRequestUrl, getKlipAddress } = useKlip();
-  const [myBalance, setMyBalance] = useState('');
-  const [myAddress, setMyAddress] = useState('');
-  const [nftList, setNftList] = useState<
-    { tokenId: string; tokenURI: string }[]
-  >([]);
-
-  const getUser = useCallback(async () => {
-    const data = await getKlipAddress();
-    const klayBalance = await getBalance(data.result.klaytn_address);
-    setMyBalance(klayBalance);
-    setMyAddress(data.result.klaytn_address);
-    setAddress(data.result.klaytn_address);
-  }, [getKlipAddress, setAddress]);
+  const [nftList, setNftList] = useState<NftItem[]>([]);
+  const { authRequestUrl, buyCard } = useKlip();
+  const [showAuthRequestModal, setShowAuthRequestModal] = useState(false);
 
   useEffect(() => {
-    getUser();
-  }, [getUser]);
-
-  useEffect(() => {
-    if (!myAddress) return;
     (async () => {
-      const nftListData = await getNftListOf(myAddress);
+      const nftListData = await getNftListOf(
+        process.env.REACT_APP_MARKET_CONTRACT_ADDRESS,
+      );
       setNftList(nftListData);
     })();
-  }, [myAddress]);
+  }, []);
+
+  const onClickBuy = async (tokenId: string) => {
+    Modal.confirm({
+      title: '구매하시겠습니까?',
+      onOk: async () => {
+        try {
+          setShowAuthRequestModal(true);
+          await buyCard(tokenId);
+          message.success('구매하였습니다.');
+        } catch (error) {
+          message.error('오류가 발생했습니다.');
+        } finally {
+          setShowAuthRequestModal(false);
+        }
+      },
+    });
+  };
 
   return (
     <div>
-      <PageHeader title="내 지갑" subTitle={myAddress}>
+      <PageHeader title="Market NFT List">
         <Row>
-          <Statistic title="Balance" prefix="klay" value={myBalance} />
+          <Statistic title="List" value={nftList.length} />
         </Row>
       </PageHeader>
-      <div style={{ textAlign: 'center' }}>
-        {authRequestUrl && <QRCode value={authRequestUrl} size={200} />}
-      </div>
+
       <div style={{ marginTop: 50, padding: 30 }}>
         <Row gutter={[16, 16]}>
           {nftList.map((nft) => (
             <Col span={6} key={nft.tokenId}>
-              <Card hoverable cover={<img src={nft.tokenURI} alt="NFT" />}>
+              <Card
+                hoverable
+                cover={<img src={nft.tokenURI} alt="NFT" />}
+                onClick={() => onClickBuy(nft.tokenId)}
+              >
                 <Card.Meta title={`NFT ${nft.tokenId}`} />
               </Card>
             </Col>
           ))}
         </Row>
       </div>
+
+      <Modal
+        visible={showAuthRequestModal}
+        title="Authorization"
+        bodyStyle={{ textAlign: 'center' }}
+        zIndex={10000}
+        onCancel={() => setShowAuthRequestModal(false)}
+      >
+        <QRCode value={authRequestUrl || ''} size={200} />
+      </Modal>
     </div>
   );
 }

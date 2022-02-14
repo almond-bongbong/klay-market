@@ -13,15 +13,14 @@ interface FormData {
 function Mint() {
   const [values, setValues] = useState<FormData>();
   const { authRequestUrl, mintWithURI } = useKlip();
-  const { address } = useMyContext();
+  const { me } = useMyContext();
 
   const handleChange = (_: unknown, allValues: FormData) => {
     setValues(allValues);
   };
 
   const handleMint = async () => {
-    console.log('mint');
-    if (!address) {
+    if (!me?.address) {
       message.warning('지갑을 인증해 주세요.');
       return;
     }
@@ -31,7 +30,7 @@ function Mint() {
     }
 
     const randomTokenId = (Math.random() * 100000000).toFixed();
-    const result = await mintWithURI(address, randomTokenId, values.uri);
+    const result = await mintWithURI(me.address, randomTokenId, values.uri);
     console.log(result);
   };
 

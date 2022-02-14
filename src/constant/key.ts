@@ -1,1 +1,1 @@
-export default null;
+export const ME_STORAGE_KEY = 'me';

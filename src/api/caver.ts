@@ -42,7 +42,12 @@ export const getBalance = async (address: string) => {
   );
 };
 
-export const getNftListOf = async (address: string) => {
+export interface NftItem {
+  tokenId: string;
+  tokenURI: string;
+}
+
+export const getNftListOf = async (address: string): Promise<NftItem[]> => {
   // fetch balance
   const balance = await NFTContract.methods.balanceOf(address).call();
 
