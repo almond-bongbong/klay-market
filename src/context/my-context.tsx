@@ -7,7 +7,7 @@ interface Me {
 
 interface Context {
   me: Me | null;
-  setMe: (me: Me) => void;
+  setMe: (me: Me | null) => void;
 }
 
 const MyContext = createContext<Context>({

@@ -3,6 +3,7 @@ import { Card, Col, message, Modal, PageHeader, Row, Statistic } from 'antd';
 import { getNftListOf, NftItem } from '../api/caver';
 import useKlip from '../hook/useKlip';
 import QRCode from 'qrcode.react';
+import { ua } from '../lib/ua';
 
 function Market() {
   const [nftList, setNftList] = useState<NftItem[]>([]);
@@ -25,7 +26,7 @@ function Market() {
       title: '구매하시겠습니까?',
       onOk: async () => {
         try {
-          setShowAuthRequestModal(true);
+          if (ua().device.type !== 'mobile') setShowAuthRequestModal(true);
           await buyCard(tokenId);
           message.success('구매하였습니다.');
           await initList();
@@ -49,7 +50,10 @@ function Market() {
       <div style={{ marginTop: 50, padding: 30 }}>
         <Row gutter={[16, 16]}>
           {nftList.map((nft) => (
-            <Col span={6} key={nft.tokenId}>
+            <Col
+              span={ua().device.type === 'mobile' ? 12 : 6}
+              key={nft.tokenId}
+            >
               <Card
                 hoverable
                 cover={<img src={nft.tokenURI} alt="NFT" />}

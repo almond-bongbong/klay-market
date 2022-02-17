@@ -18,7 +18,12 @@ function useKlip() {
     setAuthRequestUrl(requestUrl);
 
     if (ua().device.type === 'mobile') {
-      window.open(requestUrl);
+      // window.open(requestUrl);
+      const url =
+        ua().os.name === 'iOS'
+          ? `kakaotalk://klipwallet/open?url=https://klipwallet.com/?target=/a2a?request_key=${requestKey}`
+          : `intent://klipwallet/open?url=https://klipwallet.com/?target=/a2a?request_key=${requestKey}#Intent;scheme=kakaotalk;package=com.kakao.talk;end`;
+      window.location.href = url;
     }
   };
 

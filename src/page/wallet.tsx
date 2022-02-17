@@ -3,8 +3,18 @@ import { useMyContext } from '../context/my-context';
 import useKlip from '../hook/useKlip';
 import { getBalance, getNftListOf } from '../api/caver';
 import { ME_STORAGE_KEY } from '../constant/key';
-import { Card, Col, message, Modal, PageHeader, Row, Statistic } from 'antd';
+import {
+  Button,
+  Card,
+  Col,
+  message,
+  Modal,
+  PageHeader,
+  Row,
+  Statistic,
+} from 'antd';
 import QRCode from 'qrcode.react';
+import { ua } from '../lib/ua';
 
 function Wallet() {
   const { me, setMe } = useMyContext();
@@ -25,11 +35,10 @@ function Wallet() {
     localStorage.setItem(ME_STORAGE_KEY, JSON.stringify(loggedInMe));
   }, [getKlipAddress, setMe]);
 
-  useEffect(() => {
-    if (!me) {
-      getUser();
-    }
-  }, [me, getUser]);
+  const logout = useCallback(() => {
+    setMe(null);
+    localStorage.removeItem(ME_STORAGE_KEY);
+  }, [setMe]);
 
   const initMyNftList = useCallback(async () => {
     if (!me?.address) return;
@@ -51,7 +60,7 @@ function Wallet() {
     Modal.confirm({
       title: `"${tokenId}"를 마켓에 등록하시겠습니까?`,
       onOk: async () => {
-        setShowAuthRequestModal(true);
+        if (ua().device.type !== 'mobile') setShowAuthRequestModal(true);
         const data = await listingCardToMarket(me.address, tokenId);
         if (data?.result?.status === 'success') {
           message.success('마켓에 등록되었습니다.');
@@ -64,7 +73,15 @@ function Wallet() {
 
   return (
     <div>
-      <PageHeader title="My Wallet" subTitle={me?.address}>
+      <PageHeader
+        title="My Wallet"
+        subTitle={me?.address}
+        extra={
+          <Button size="small" type="text" onClick={me ? logout : getUser}>
+            {me ? '로그아웃' : '로그인'}
+          </Button>
+        }
+      >
         <Row>
           <Statistic title="Balance" prefix="klay" value={me?.balance} />
         </Row>
@@ -74,7 +91,10 @@ function Wallet() {
         <div style={{ marginTop: 50, padding: 30 }}>
           <Row gutter={[16, 16]}>
             {nftList.map((nft) => (
-              <Col span={6} key={nft.tokenId}>
+              <Col
+                span={ua().device.type === 'mobile' ? 12 : 6}
+                key={nft.tokenId}
+              >
                 <Card
                   hoverable
                   cover={<img src={nft.tokenURI} alt="NFT" />}
