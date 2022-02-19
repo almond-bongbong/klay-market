@@ -78,7 +78,7 @@ function Wallet() {
         subTitle={me?.address}
         extra={
           <Button size="small" type="text" onClick={me ? logout : getUser}>
-            {me ? '로그아웃' : '로그인'}
+            {me ? 'logout' : 'login'}
           </Button>
         }
       >
